@@ -1,12 +1,33 @@
 import express, { Request, Response } from "express";
+import type { ErrorRequestHandler } from "express";
+import { ProyectoRepository } from "./repo";
+import { createProyectoService } from "./services";
+import { createProyectoController } from "./controllers";
 
-const app = express();
+const createApp = () => {
+  const app = express();
+  app.use(express.json());
+
+  const proyectosRepo = new ProyectoRepository();
+  const proyectosService = createProyectoService(proyectosRepo);
+
+  app.use("/proyectos", createProyectoController(proyectosService));
+
+  app.use(errorHandler);
+
+  app.use((req, res) => {
+    res.status(404).json({ message: "No encontrado" });
+  });
+
+  return app;
+};
+
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+  // TODO: En verdaderos errores deberia entregar error 500.
+  console.error(err);
+  return res.status(500).json({ message: "Error interno" });
+};
+
 const port = process.env.PORT || 3000;
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Hello, TypeScript Express!");
-});
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+createApp().listen(port);
