@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import type { ErrorRequestHandler } from "express";
 import { ProyectoRepository } from "./repo";
 import { createProyectoService } from "./services";
@@ -15,7 +15,7 @@ const createApp = () => {
 
   app.use(errorHandler);
 
-  app.use((req, res) => {
+  app.use((_req, res) => {
     res.status(404).json({ message: "No encontrado" });
   });
 
