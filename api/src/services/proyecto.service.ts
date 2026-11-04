@@ -1,23 +1,19 @@
 import { Proyecto } from "../model";
 import { type ResumenRegion } from "../model/proyecto";
 import { createPaginateResponse, PaginateResponseShape } from "../model/response";
-import { ProyectoRepository, type GetAllFilters } from "../repo";
+import { ProyectoStore } from "../store";
+import { Filtros } from "../store/proyecto.store";
 
-export const createProyectoService = (repo: ProyectoRepository) => {
-  return {
-    getAll: async ({ page = 1, page_size = 20, ...filters }: GetAllInput): Promise<PaginateResponseShape<Proyecto>> => {
-      const proyectos = repo.getAll(filters);
+export const createProyectoService = (store: ProyectoStore) => ({
+  getAll: async ({ page = 1, page_size = 20, ...filtros }: GetAllInput): Promise<PaginateResponseShape<Proyecto>> => {
+    const { items } = await store.find(filtros, { page, pageSize: page_size });
+    return createPaginateResponse(items, page, page_size);
+  },
 
-      return createPaginateResponse(proyectos, page, page_size);
-    },
+  getResumenRegion: (): Promise<ResumenRegion[]> => store.resumenPorRegion(),
+});
 
-    getResumenRegion: async (): Promise<Array<ResumenRegion>> => {
-      return repo.getResumenRegion();
-    },
-  };
-};
-
-export type GetAllInput = GetAllFilters & {
+export type GetAllInput = Filtros & {
   page: number | undefined;
   page_size: number | undefined;
 };

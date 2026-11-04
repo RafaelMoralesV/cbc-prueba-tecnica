@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { timingSafeEqual } from "crypto";
+import { timingSafeEqual } from "node:crypto";
 
 const comparar = (a: string, b: string): boolean => {
   const bufA = Buffer.from(a);

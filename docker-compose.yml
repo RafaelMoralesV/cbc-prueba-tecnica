@@ -49,7 +49,11 @@ services:
       SOURCE_API_KEY: ${SOURCE_API_KEY:-dev-source-key}
       API_KEY: ${API_KEY:-dev-api-key}
       DIR_DESCARTADOS: ${DISCARDED_DIR:-/api/output}
+      DB_PATH: /app/data/proyectos.db
+      INGEST_ON_START: ${INGEST_ON_START:-true}
+      INGEST_INTERVAL_MS: ${INGEST_INTERVAL_MS:-0}
     volumes:
+      - ./data:/app/data
       - ./output:/api/output
     depends_on:
       mock-api:

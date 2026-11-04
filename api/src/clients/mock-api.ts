@@ -40,6 +40,7 @@ const createClient = (base_url: string, api_key: string) => {
 
   const client: AxiosInstance = axios.create({
     baseURL: base_url,
+    timeout: 10_000,
     headers: { "Content-Type": "application/json", Accept: "application/json" },
   });
 
@@ -61,7 +62,8 @@ const createClient = (base_url: string, api_key: string) => {
       const config = error.config as ConfigConRetry | undefined;
       const status = error.response?.status;
 
-      if (!config || (status !== 500 && status !== 429)) {
+      const reintentable = !error.response || status === 429 || (status !== undefined && status >= 500);
+      if (!config || reintentable) {
         return Promise.reject(error);
       }
 
@@ -73,7 +75,7 @@ const createClient = (base_url: string, api_key: string) => {
       config.contador_retry = intento + 1;
 
       const delay =
-        status === 429 ? retryDespuesDeDelay(error.response?.headers?.["Retry-After"]) : delayRetryRandom(intento);
+        status === 429 ? retryDespuesDeDelay(error.response?.headers?.["retry-after"]) : delayRetryRandom(intento);
 
       await sleep(delay);
 
@@ -95,7 +97,7 @@ export type MockApiProyecto = {
   nombre: string;
   titular: string;
   region: string;
-  monto: number;
+  monto: string;
   fecha_ingreso: string;
   estado: string;
   actualizado_en: string;
