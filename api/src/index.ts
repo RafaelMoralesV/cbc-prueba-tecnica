@@ -4,14 +4,14 @@ import { ProyectoRepository } from "./repo";
 import { createProyectoService } from "./services";
 import { createProyectoController } from "./controllers";
 
-const createApp = () => {
+const createApp = (proyectosRepo: ProyectoRepository) => {
   const app = express();
   app.use(express.json());
 
-  const proyectosRepo = new ProyectoRepository();
   const proyectosService = createProyectoService(proyectosRepo);
+  const controller = createProyectoController(proyectosService);
 
-  app.use("/proyectos", createProyectoController(proyectosService));
+  app.use("/proyectos", controller);
 
   app.use(errorHandler);
 
@@ -27,6 +27,16 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   return res.status(500).json({ message: "Error interno" });
 };
 
-const port = process.env.PORT || 3000;
+const main = async () => {
+  const proyectosRepo = new ProyectoRepository();
+  await proyectosRepo.load(); // fail fast if upstream is down
 
-createApp().listen(port);
+  const app = createApp(proyectosRepo);
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => console.info(`listening on ${port}`));
+};
+
+main().catch((err) => {
+  console.error("fallo al iniciar:", err);
+  process.exit(1);
+});

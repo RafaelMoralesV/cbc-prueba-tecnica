@@ -47,4 +47,5 @@ export type MockApiProyecto = {
   monto: number;
   fecha_ingreso: string;
   estado: string;
+  actualizado_en: string;
 };

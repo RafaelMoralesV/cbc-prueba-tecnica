@@ -208,6 +208,16 @@ export const toEstado = (raw: string): Estado => {
   return estado;
 };
 
+export type Timestamp = Date;
+export const toUpdatedAt = (raw: string): Timestamp => {
+  const s = (raw ?? "").trim();
+  if (!s) throw new Error("actualizado_en_vacio");
+
+  const d = new Date(s);
+  if (Number.isNaN(d.getTime())) throw new Error("actualizado_en_invalido");
+  return d;
+};
+
 /// Proyecto
 export type Proyecto = {
   id: Id;
@@ -217,4 +227,5 @@ export type Proyecto = {
   monto_musd: Monto;
   fecha_ingreso: Fecha;
   estado: Estado;
+  updated_at: Timestamp;
 };
