@@ -22,7 +22,7 @@ const createApp = () => {
   return app;
 };
 
-const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
   // TODO: En verdaderos errores deberia entregar error 500.
   console.error(err);
   return res.status(500).json({ message: "Error interno" });

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
 import { createProyectoService } from "../services";
-import type { Proyecto } from "../model";
+import type { PaginateResponseShape, Proyecto } from "../model";
 
 export const createProyectoController = (
   service: ReturnType<typeof createProyectoService>,
@@ -9,7 +9,7 @@ export const createProyectoController = (
   const router = Router();
 
   router.get("/", async (_req: Request, res: Response) => {
-    const proyectos: Array<Proyecto> = await service.getAll();
+    const proyectos: PaginateResponseShape<Proyecto> = await service.getAll();
 
     res.json(proyectos);
   });
