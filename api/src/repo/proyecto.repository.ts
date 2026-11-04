@@ -53,10 +53,27 @@ export class ProyectoRepository {
   }
 
   /// Obtiene todos los proyectos.
-  getAll(): Proyecto[] {
-    return [...this.store.values()];
+  getAll(filters: GetAllFilters = {}): Proyecto[] {
+    const region = filters.region ? normalizar_filtro(filters.region) : undefined;
+    const estado = filters.estado ? normalizar_filtro(filters.estado) : undefined;
+    const { monto_minimo } = filters;
+
+    return [...this.store.values()].filter((p) => {
+      if (region && normalizar_filtro(p.region) !== region) return false;
+      if (estado && normalizar_filtro(p.estado) !== estado) return false;
+      if (monto_minimo !== undefined && p.monto_musd < monto_minimo) return false;
+      return true;
+    });
   }
 }
+
+export type GetAllFilters = {
+  region?: string;
+  estado?: string;
+  monto_minimo?: number;
+};
+
+const normalizar_filtro = (s: string) => s.trim().toLowerCase();
 
 const toProyecto = (dto: MockApiProyecto): Proyecto => ({
   id: IntoProyecto.toId(dto.id),

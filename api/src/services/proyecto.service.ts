@@ -1,13 +1,18 @@
 import { Proyecto } from "../model";
 import { createPaginateResponse, PaginateResponseShape } from "../model/response";
-import { ProyectoRepository } from "../repo";
+import { ProyectoRepository, type GetAllFilters } from "../repo";
 
 export const createProyectoService = (repo: ProyectoRepository) => {
   return {
-    getAll: async (page: number = 1, page_size: number = 20): Promise<PaginateResponseShape<Proyecto>> => {
-      const proyectos = repo.getAll();
+    getAll: async ({ page = 1, page_size = 20, ...filters }: GetAllInput): Promise<PaginateResponseShape<Proyecto>> => {
+      const proyectos = repo.getAll(filters);
 
       return createPaginateResponse(proyectos, page, page_size);
     },
   };
+};
+
+export type GetAllInput = GetAllFilters & {
+  page: number | undefined;
+  page_size: number | undefined;
 };

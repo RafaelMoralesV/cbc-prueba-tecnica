@@ -1,1 +1,1 @@
-export { ProyectoRepository } from "./proyecto.repository";
+export { ProyectoRepository, type GetAllFilters } from "./proyecto.repository";
