@@ -20,7 +20,7 @@ export const createPaginateResponse = <T>(
   }
 
   const total_items = items.length;
-  const total_pages = Math.ceil(total_items / page_size) + 1;
+  const total_pages = Math.floor(total_items / page_size) + 1;
 
   const first_item_index = (page - 1) * page_size;
   const last_item_index = page * page_size;
