@@ -11,7 +11,7 @@ export class ProyectoRepository {
 
   /// Busca una pagina desde el MockApiClient
   private async fetchPage(page: number): Promise<PagResShape<MockApiProyecto>> {
-    const { data } = await MockApiClient.get<PagResShape<MockApiProyecto>>("/proyectos", {
+    const { data } = await MockApiClient.get<PagResShape<MockApiProyecto>>("/api/v1/proyectos", {
       params: { page, page_size: PAGE_SIZE },
     });
     return data;

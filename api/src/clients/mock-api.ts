@@ -86,8 +86,8 @@ const createClient = (base_url: string, api_key: string) => {
 
 /// Instancia especifica del API provista por CBC.
 export const MockApiClient = createClient(
-  process.env.MOCK_API_URL ?? "http://localhost:8001/api/v1",
-  process.env.MOCK_API_KEY ?? "dev-source-key",
+  process.env.SOURCE_BASE_URL ?? "http://localhost:8001",
+  process.env.SOURCE_API_KEY ?? "dev-source-key",
 );
 
 export type MockApiProyecto = {

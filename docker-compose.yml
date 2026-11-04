@@ -28,7 +28,26 @@ services:
       MOCK_ERROR_RATE: ${MOCK_ERROR_RATE:-0.15}
       MOCK_SEED: ${MOCK_SEED:-42}
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/health', timeout=2)"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request as u; u.urlopen('http://localhost:8000/health', timeout=2)",
+        ]
       interval: 5s
       timeout: 3s
       retries: 5
+
+  app:
+    build: ./api
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: 8000
+      SOURCE_BASE_URL: http://mock-api:8000
+      SOURCE_API_KEY: ${SOURCE_API_KEY:-dev-source-key}
+      API_KEY: ${API_KEY:-dev-api-key}
+    depends_on:
+      mock-api:
+        condition: service_healthy
