@@ -2,7 +2,7 @@ import express from "express";
 import type { ErrorRequestHandler } from "express";
 import { ProyectoRepository } from "./repo";
 import { createProyectoService } from "./services";
-import { createProyectoController } from "./controllers";
+import { BadRequestError, createProyectoController } from "./controllers";
 
 const createApp = (proyectosRepo: ProyectoRepository) => {
   const app = express();
@@ -23,6 +23,9 @@ const createApp = (proyectosRepo: ProyectoRepository) => {
 };
 
 const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
+  if (err instanceof BadRequestError) {
+    return res.status(400).json({ message: err.message });
+  }
   console.error(err);
   return res.status(500).json({ message: "Error interno" });
 };
