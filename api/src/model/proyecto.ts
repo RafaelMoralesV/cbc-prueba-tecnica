@@ -204,7 +204,7 @@ export const toEstado = (raw: string): Estado => {
   };
 
   const estado = map[normalized];
-  if (!estado) throw new Error(`estado_desconocido: ${estado}`);
+  if (!estado) throw new Error(`estado_desconocido`);
   return estado;
 };
 

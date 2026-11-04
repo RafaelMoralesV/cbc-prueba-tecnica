@@ -1,9 +1,15 @@
+import { mkdir, writeFile } from "node:fs/promises";
 import { MockApiClient } from "../clients";
 import { MockApiProyecto } from "../clients/mock-api";
 import { type Proyecto, type PaginateResponseShape as PagResShape, IntoProyecto, round_a_tres } from "../model";
 import { type Region, type ResumenRegion } from "../model/proyecto";
+import path from "node:path";
 
 const PAGE_SIZE = 20;
+const DIR_DESCARTADOS = process.env.DIR_DESCARTADOS ?? "./output";
+const ARCHIVO_DESCARTADOS = "proyectos_descartados.csv";
+
+type Descartado = { id: unknown; nombre: unknown; motivo: string };
 
 export class ProyectoRepository {
   /// Voy a ocupar este Hashmap como base de datos momentaneamente.
@@ -33,6 +39,7 @@ export class ProyectoRepository {
     }
 
     const next = new Map<Proyecto["id"], Proyecto>();
+    const descartados: Descartado[] = [];
     for (const dto of dtos) {
       try {
         const proyecto = toProyecto(dto);
@@ -46,11 +53,36 @@ export class ProyectoRepository {
 
         next.set(proyecto.id, proyecto);
       } catch (err) {
-        console.info(`proyecto descartado (id=${dto.id}):`, err, { dto });
+        console.info(`proyecto descartado (id=${dto.id}):`, { dto });
+        descartados.push({
+          id: dto.id,
+          nombre: dto.nombre,
+          motivo: err instanceof Error ? err.message : String(err),
+        });
       }
     }
 
     this.store = next;
+    await this.writeDescartados(descartados);
+  }
+
+  private async writeDescartados(descartados: Descartado[]): Promise<void> {
+    try {
+      await mkdir(DIR_DESCARTADOS, { recursive: true });
+      const filePath = path.join(DIR_DESCARTADOS, ARCHIVO_DESCARTADOS);
+
+      const csvCell = (value: unknown): string => {
+        const s = value === null || value === undefined ? "" : String(value);
+        return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+      };
+
+      const lines = ["id,nombre,motivo", ...descartados.map((d) => [d.id, d.nombre, d.motivo].map(csvCell).join(","))];
+
+      await writeFile(filePath, lines.join("\n") + "\n", "utf8");
+      console.info(`${descartados.length} proyectos descartados escritos en ${filePath}`);
+    } catch (err) {
+      console.error("no se pudo escribir el CSV de descartados:", err);
+    }
   }
 
   /// Obtiene todos los proyectos.
