@@ -1,6 +1,7 @@
 import { MockApiClient } from "../clients";
 import { MockApiProyecto } from "../clients/mock-api";
-import { type Proyecto, type PaginateResponseShape as PagResShape, IntoProyecto } from "../model";
+import { type Proyecto, type PaginateResponseShape as PagResShape, IntoProyecto, round_a_tres } from "../model";
+import { type Region, type ResumenRegion } from "../model/proyecto";
 
 const PAGE_SIZE = 20;
 
@@ -64,6 +65,22 @@ export class ProyectoRepository {
       if (monto_minimo !== undefined && p.monto_musd < monto_minimo) return false;
       return true;
     });
+  }
+
+  getResumenRegion(): ResumenRegion[] {
+    const acc = new Map<Region, ResumenRegion>();
+
+    for (const p of this.store.values()) {
+      const row = acc.get(p.region) ?? { region: p.region, cantidad: 0, monto_total: 0 };
+      row.cantidad += 1;
+      row.monto_total += p.monto_musd;
+      acc.set(p.region, row);
+    }
+
+    const copia = [...acc.values()];
+    const final = copia.map((r) => ({ ...r, monto_total: round_a_tres(r.monto_total) }));
+
+    return final.sort((a, b) => a.region.localeCompare(b.region));
   }
 }
 

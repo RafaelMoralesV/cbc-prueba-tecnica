@@ -229,3 +229,10 @@ export type Proyecto = {
   estado: Estado;
   updated_at: Timestamp;
 };
+
+/// Resumen de Proyectos por Region
+export type ResumenRegion = {
+  region: Region;
+  cantidad: number;
+  monto_total: number;
+};

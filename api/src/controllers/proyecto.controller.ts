@@ -6,7 +6,7 @@ import { parseIntParam, parseNumberParam, parseStringParam } from ".";
 export const createProyectoController = (service: ReturnType<typeof createProyectoService>) => {
   const router = Router();
 
-  router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+  router.get("/proyectos", async (req: Request, res: Response, next: NextFunction) => {
     try {
       const region = parseStringParam("region", req.query.region);
       const estado = parseStringParam("estado", req.query.estado);
@@ -16,6 +16,14 @@ export const createProyectoController = (service: ReturnType<typeof createProyec
       const page_size = parseIntParam("page_size", req.query.page_size, { max: 100 });
 
       res.json(await service.getAll({ page, page_size, region, estado, monto_minimo }));
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  router.get("/resumen", async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      res.json(await service.getResumenRegion());
     } catch (err) {
       next(err);
     }

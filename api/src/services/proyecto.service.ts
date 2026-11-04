@@ -1,4 +1,5 @@
 import { Proyecto } from "../model";
+import { type ResumenRegion } from "../model/proyecto";
 import { createPaginateResponse, PaginateResponseShape } from "../model/response";
 import { ProyectoRepository, type GetAllFilters } from "../repo";
 
@@ -8,6 +9,10 @@ export const createProyectoService = (repo: ProyectoRepository) => {
       const proyectos = repo.getAll(filters);
 
       return createPaginateResponse(proyectos, page, page_size);
+    },
+
+    getResumenRegion: async (): Promise<Array<ResumenRegion>> => {
+      return repo.getResumenRegion();
     },
   };
 };

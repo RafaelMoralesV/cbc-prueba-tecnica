@@ -11,7 +11,7 @@ const createApp = (proyectosRepo: ProyectoRepository) => {
   const proyectosService = createProyectoService(proyectosRepo);
   const controller = createProyectoController(proyectosService);
 
-  app.use("/proyectos", controller);
+  app.use("/", controller);
 
   app.use(errorHandler);
 
