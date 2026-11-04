@@ -3,6 +3,13 @@ import type { ErrorRequestHandler } from "express";
 import { ProyectoRepository } from "./repo";
 import { createProyectoService } from "./services";
 import { BadRequestError, createProyectoController } from "./controllers";
+import { apiKeyAuth } from "./middleware/api-key-auth";
+
+const API_KEY = process.env.API_KEY;
+if (!API_KEY) {
+  console.error("Falta la variable de entorno API_KEY");
+  process.exit(1);
+}
 
 const createApp = (proyectosRepo: ProyectoRepository) => {
   const app = express();
@@ -11,6 +18,7 @@ const createApp = (proyectosRepo: ProyectoRepository) => {
   const proyectosService = createProyectoService(proyectosRepo);
   const controller = createProyectoController(proyectosService);
 
+  app.use(apiKeyAuth(API_KEY));
   app.use("/", controller);
 
   app.use(errorHandler);
